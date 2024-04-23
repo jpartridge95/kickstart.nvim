@@ -52,6 +52,11 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz");
 vim.keymap.set("n", "<leader>T", ":terminal<cr>");
 vim.keymap.set("n", "<leader>t", ":tabnew<cr>");
 vim.keymap.set("n", "<leader>nt", ":Neotree<cr>");
+--moving lines up and down
+vim.keymap.set("n", "<A-j>", ":m+1<CR>==");
+vim.keymap.set("n", "<A-k>", ":m-2<CR>==");
+vim.keymap.set("v", "<A-k>", ":m-2<CR>gv=gv");
+vim.keymap.set("v", "<A-j>", ":m'>+<CR>gv=gv");
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
