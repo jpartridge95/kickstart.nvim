@@ -49,6 +49,9 @@ vim.wo.number = true;
 vim.keymap.set("n", "<C-d>", "<C-d>zz");
 vim.keymap.set("n", "<C-u>", "<C-u>zz");
 
+vim.opt["tabstop"] = 4
+vim.opt["shiftwidth"] = 4
+
 vim.keymap.set("n", "<leader>T", ":terminal<cr>");
 vim.keymap.set("n", "<leader>t", ":tabnew<cr>");
 vim.keymap.set("n", "<leader>nt", ":Neotree<cr>");
