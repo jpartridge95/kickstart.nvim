@@ -60,6 +60,7 @@ vim.keymap.set("n", "<A-j>", ":m+1<CR>==");
 vim.keymap.set("n", "<A-k>", ":m-2<CR>==");
 vim.keymap.set("v", "<A-k>", ":m-2<CR>gv=gv");
 vim.keymap.set("v", "<A-j>", ":m'>+<CR>gv=gv");
+vim.keymap.set("n", "<leader>p", "viwpyiw");
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -82,12 +83,14 @@ vim.opt.rtp:prepend(lazypath)
 --
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
+
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
+  'nvim-neotest/nvim-nio',
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
@@ -168,14 +171,14 @@ require('lazy').setup({
     },
   },
 
-  {
+  -- {
     -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
+  --   'navarasu/onedark.nvim',
+  --   priority = 1000,
+  --   config = function()
+  --     vim.cmd.colorscheme 'onedark'
+  --   end,
+  -- },
 
   {
     -- Set lualine as statusline
@@ -530,6 +533,27 @@ mason_lspconfig.setup_handlers {
   end,
 }
 
+local mason_registry = require('mason-registry')
+local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+
+local lspconfig = require('lspconfig')
+
+lspconfig.ts_ls.setup {
+  init_options = {
+    plugins = {
+      {
+        name = '@vue/typescript-plugin',
+        location = vue_language_server_path,
+        languages = { 'vue' },
+      },
+    },
+  },
+  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+}
+
+-- No need to set `hybridMode` to `true` as it's the default value
+lspconfig.volar.setup {}
+
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
@@ -577,6 +601,16 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+require("tokyonight").setup({
+  transparent = true,
+  styles = {
+     sidebars = "transparent",
+     floats = "transparent",
+  }
+})
+
+vim.cmd("colorscheme tokyonight")
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
