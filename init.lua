@@ -171,6 +171,7 @@ vim.pack.add({
   { src = gh('windwp/nvim-autopairs') },
   { src = gh('Decodetalkers/csharpls-extended-lsp.nvim') }
 })
+
 -- LSP Stuff
 vim.lsp.config['lua_ls'] = {
   cmd = { 'lua-language-server' },
@@ -186,12 +187,23 @@ vim.lsp.config['lua_ls'] = {
 }
 vim.lsp.enable('lua_ls')
 
+require("csharpls_extended").buf_read_cmd_bind()
+
 vim.lsp.config['csharp-ls'] = {
 	handlers = {
 		["textDocument/definition"] = require('csharpls_extended').handler,
 		["textDocument/typeDefinition"] = require('csharpls_extended').handler,
 	},
-    cmd = { 'csharp-ls' },
+    cmd = function(dispatchers, config)
+		--- NOTE: csharp-ls is using rpc to communicate with editor, not stdout, so you need to write it in this way
+		return vim.lsp.rpc.start({ 'csharp-ls', '--features', 'metadata-uris' }, dispatchers, {
+			-- csharp-ls attempt to locate sln, slnx or csproj files from cwd, so set cwd to root directory.
+			-- If cmd_cwd is provided, use it instead.
+			cwd = config.cmd_cwd or config.root_dir,
+			env = config.cmd_env,
+			detached = config.detached,
+		})
+	end,
     filetypes = { 'cs' },
     root_dir = vim.fs.root(
       0,
@@ -200,7 +212,6 @@ vim.lsp.config['csharp-ls'] = {
       end)
   }
 vim.lsp.enable('csharp-ls')
-require("csharpls_extended").buf_read_cmd_bind()
 
 local tokyo = require('tokyonight')
 tokyo.setup {
@@ -337,6 +348,8 @@ telescope.load_extension('ui-select')
 telescope.load_extension('csharpls_definition')
 local builtin = require 'telescope.builtin'
 
+
+
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
 vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -371,3 +384,16 @@ vim.keymap.set('n', '<leader>sn', function()
   builtin.find_files { cwd = vim.fn.stdpath 'config' }
 end, { desc = '[S]earch [N]eovim files' })
 
+vim.api.nvim_create_autocmd('LspAttach', {
+	group = vim.api.nvim_create_augroup('telescope-lsp-attach', { clear = true }),
+	callback = function(event)
+	  local buf = event.buf
+
+	  vim.keymap.set('n', 'grr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
+	  vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+	  vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+	  vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { buffer = buf, desc = 'Open Document Symbols' })
+	  vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = 'Open Workspace Symbols' })
+	  vim.keymap.set('n', 'grt', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto [T]ype Definition' })
+	end,
+})
