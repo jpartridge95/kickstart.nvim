@@ -334,10 +334,7 @@ telescope.setup {
 }
 --telescope.load_extension('fzf')
 telescope.load_extension('ui-select')
-<<<<<<< Updated upstream
-=======
 telescope.load_extension('csharpls_definition')
->>>>>>> Stashed changes
 local builtin = require 'telescope.builtin'
 
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
@@ -373,7 +370,4 @@ end, { desc = '[S]earch [/] in Open Files' })
 vim.keymap.set('n', '<leader>sn', function()
   builtin.find_files { cwd = vim.fn.stdpath 'config' }
 end, { desc = '[S]earch [N]eovim files' })
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
