@@ -168,9 +168,10 @@ vim.pack.add({
   { src = gh('nvim-treesitter/nvim-treesitter') },
   { src = gh('nvim-neo-tree/neo-tree.nvim') },
   { src = gh('MunifTanjim/nui.nvim') },
-  { src = gh('windwp/nvim-autopairs') }
+  { src = gh('windwp/nvim-autopairs') },
+  { src = gh('Decodetalkers/csharpls-extended-lsp.nvim') }
 })
-
+-- LSP Stuff
 vim.lsp.config['lua_ls'] = {
   cmd = { 'lua-language-server' },
   filetypes = { 'lua' },
@@ -184,6 +185,22 @@ vim.lsp.config['lua_ls'] = {
   }
 }
 vim.lsp.enable('lua_ls')
+
+vim.lsp.config['csharp-ls'] = {
+	handlers = {
+		["textDocument/definition"] = require('csharpls_extended').handler,
+		["textDocument/typeDefinition"] = require('csharpls_extended').handler,
+	},
+    cmd = { 'csharp-ls' },
+    filetypes = { 'cs' },
+    root_dir = vim.fs.root(
+      0,
+      function(name, path)
+        return name:match('%.sln$') ~= nil
+      end)
+  }
+vim.lsp.enable('csharp-ls')
+require("csharpls_extended").buf_read_cmd_bind()
 
 local tokyo = require('tokyonight')
 tokyo.setup {
@@ -238,7 +255,7 @@ blink.setup({
     documentation = { auto_show = false }
   },
   sources = {
-    default = { 'lsp', 'path', 'snippets', 'buffer' }
+    default = { 'lsp', 'path', 'snippets' }
   },
   fuzzy = {
     implementation = 'lua'
@@ -317,6 +334,10 @@ telescope.setup {
 }
 --telescope.load_extension('fzf')
 telescope.load_extension('ui-select')
+<<<<<<< Updated upstream
+=======
+telescope.load_extension('csharpls_definition')
+>>>>>>> Stashed changes
 local builtin = require 'telescope.builtin'
 
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
@@ -352,4 +373,7 @@ end, { desc = '[S]earch [/] in Open Files' })
 vim.keymap.set('n', '<leader>sn', function()
   builtin.find_files { cwd = vim.fn.stdpath 'config' }
 end, { desc = '[S]earch [N]eovim files' })
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
