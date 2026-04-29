@@ -169,10 +169,31 @@ vim.pack.add({
   { src = gh('nvim-neo-tree/neo-tree.nvim') },
   { src = gh('MunifTanjim/nui.nvim') },
   { src = gh('windwp/nvim-autopairs') },
-  { src = gh('Decodetalkers/csharpls-extended-lsp.nvim') }
+  { src = gh('GustavEikaas/easy-dotnet.nvim') }
 })
 
 -- LSP Stuff
+vim.lsp.config['tsls'] = {
+	cmd = { 'typescript-language-server', '--stdio' },
+	filetypes = {
+		'typescript',
+		'javascript',
+		'typescriptreact',
+		'javascriptreact',
+		'vue'
+	},
+	init_options = {
+		plugins = {
+			{
+				name = '@vue/typescript-plugin',
+				location = 'C:\\Program Files\\nodejs\\node_modules\\@vue\\typescript-plugin',
+				languages = { 'javascript', 'typescript', 'vue' }
+			}
+		}
+	}
+}
+vim.lsp.enable('tsls')
+
 vim.lsp.config['lua_ls'] = {
   cmd = { 'lua-language-server' },
   filetypes = { 'lua' },
@@ -187,32 +208,14 @@ vim.lsp.config['lua_ls'] = {
 }
 vim.lsp.enable('lua_ls')
 
-require("csharpls_extended").buf_read_cmd_bind()
+-- Note: This comes with some really cool features, don't use the debugger
+local dotnet_mod = require('easy-dotnet')
+dotnet_mod.setup({
+})
 
-vim.lsp.config['csharp-ls'] = {
-	handlers = {
-		["textDocument/definition"] = require('csharpls_extended').handler,
-		["textDocument/typeDefinition"] = require('csharpls_extended').handler,
-	},
-    cmd = function(dispatchers, config)
-		--- NOTE: csharp-ls is using rpc to communicate with editor, not stdout, so you need to write it in this way
-		return vim.lsp.rpc.start({ 'csharp-ls', '--features', 'metadata-uris' }, dispatchers, {
-			-- csharp-ls attempt to locate sln, slnx or csproj files from cwd, so set cwd to root directory.
-			-- If cmd_cwd is provided, use it instead.
-			cwd = config.cmd_cwd or config.root_dir,
-			env = config.cmd_env,
-			detached = config.detached,
-		})
-	end,
-    filetypes = { 'cs' },
-    root_dir = vim.fs.root(
-      0,
-      function(name, path)
-        return name:match('%.sln$') ~= nil
-      end)
-  }
-vim.lsp.enable('csharp-ls')
-
+-- Keymaps for controlling the debugger
+-- not really convinced this does anything but it stays regardless because honestly who knows at this point
+-- and I would rather not just have it shit out on my randomly
 local tokyo = require('tokyonight')
 tokyo.setup {
 	transparent = true,
@@ -242,6 +245,7 @@ require('mini.surround').setup()
 local statusline = require 'mini.statusline'
 -- set use_icons to true if you have a Nerd Font
 statusline.setup { use_icons = vim.g.have_nerd_font }
+
 
 local devicons = require('nvim-web-devicons')
 devicons.setup({})
@@ -345,9 +349,7 @@ telescope.setup {
 }
 --telescope.load_extension('fzf')
 telescope.load_extension('ui-select')
-telescope.load_extension('csharpls_definition')
 local builtin = require 'telescope.builtin'
-
 
 
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
